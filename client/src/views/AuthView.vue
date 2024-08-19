@@ -5,13 +5,16 @@
 
    const isActive = ref(false);
 
-
 </script>
 
 <template>
-   <div class="form-container" :class="{activeToggle: isActive}">
-      <div class="img_login toggle-img" ></div>
+   <div class="auth-container">
+      <div class="auth_img"></div>
       <ResetPassword/>
       <LoginForm/>
    </div>
 </template>
+
+<style>
+   @import url('../assets/styles/layouts/_auth.css');
+</style>

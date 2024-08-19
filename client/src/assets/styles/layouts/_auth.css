@@ -1,0 +1,43 @@
+.auth-container{
+   position: relative;
+   max-width: 56rem;
+   background: #fff;
+   box-shadow:  0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1),
+   0 10px 15px -3px,
+   0 4px 6px -4px;
+   border-radius: .5rem;
+   color: rgb(55 65 81);
+   height: 100%;
+   width: 56rem;
+   max-width: 100%;
+   min-height: 480px;
+}
+
+.form-container{
+   display: flex;
+   flex-direction: column;
+   justify-content: space-between;
+   padding: 3rem;
+   position: absolute;
+   height: 100%;
+   width: 50%;
+   transition: opacity .8s, transform .7s;
+}
+
+.sign-in{
+   left: 50%;
+   z-index: 2;
+}
+
+/*.auth-img{
+	background: url("../images/jogging.webp");
+	background-size: cover;
+	background-position: center;
+	height: 100%;
+	width: 50%;
+	border-radius: .5rem 0 0 .5rem;
+	z-index: 3;
+	transition: all 0.6s ease-in-out;
+	position: absolute;
+	transform: translateX(0%)
+}*/
