@@ -15,8 +15,8 @@
 			<h2 class="txt-center">Récupérer mon mot de passe</h2>
 			<form submit.prevent="handleSubmit">
 				<div class="form-group">
-					<label for="email">Email :</label>
-					<input type="email" id="email" v-model="email" required>
+					<label for="reset-email">Email :</label>
+					<input type="email" id="reset-email" v-model="email" required>
 				</div>
 				<div class="txt-right">
 					<a href="#" @click.prevent="handleBackToLogin">Connexion</a>

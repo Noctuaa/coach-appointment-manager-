@@ -17,12 +17,12 @@
 			<h2 class="txt-center">Connexion</h2>
 			<form submit.prevent="handleSubmit">
 				<div class="form-group">
-					<label for="email">Email </label>
-					<input type="email" id="email" v-model="email" required>
+					<label for="login-email">Email </label>
+					<input type="email" id="login-email" v-model="email" required>
 				</div>
 				<div class="form-group">
-					<label for="password">Mot de passe</label>	
-					<input type="password" id="password" v-model="password" required>
+					<label for="login-password">Mot de passe</label>	
+					<input type="password" id="login-password" v-model="password" required>
 				</div>
 				<div class="txt-right">
 					<a href="#" @click.prevent="handleForgotPassword">Mot de passe oublié ?</a>
