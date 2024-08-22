@@ -1,15 +1,19 @@
 <script setup>
 	import { ref } from 'vue';
 
+	const emit = defineEmits(['forgotPassword']);
 	const email = ref('');
 	const password =  ref('');
 	const rememberMe = ref(false);
 
+	const handleForgotPassword = () => {
+		emit('forgotPassword');
+	}
 
 </script>
 
 <template>
-		<div class="form-container sign-in">
+		<div class="sign-in">
 			<h2 class="txt-center">Connexion</h2>
 			<form submit.prevent="handleSubmit">
 				<div class="form-group">
@@ -21,7 +25,7 @@
 					<input type="password" id="password" v-model="password" required>
 				</div>
 				<div class="txt-right">
-					<a href="#">Mot de passe oublié ?</a>
+					<a href="#" @click.prevent="handleForgotPassword">Mot de passe oublié ?</a>
 				</div>
 				<div class="form-check">
 					<input type="checkbox" id="remember" name="remember" v-model="rememberMe">
