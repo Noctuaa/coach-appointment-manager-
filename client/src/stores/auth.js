@@ -4,7 +4,8 @@ export const useAuthStore = defineStore('auth', {
 	state: () => ({
 		user: null,
 		isAuthenticated: false,
-		rememberMe: false
+		rememberMe: false,
+		resetPasswordStatus: null
 	}),
 
 	actions: {
@@ -65,6 +66,24 @@ export const useAuthStore = defineStore('auth', {
 				this.isAuthenticated = false;
 				this.user = null;
 			}
-		}
+		},
+
+		async requestPasswordReset(email) {
+			try {
+			  // appel API pour demander la réinitialisation du mot de passe
+			  // Simulation d'un délai d'appel API 
+			  await new Promise(resolve => setTimeout(resolve, 1000))
+			  
+			  this.resetPasswordStatus = 'Un email de réinitialisation a été envoyé.'
+			  return true
+			} catch (error) {
+			  this.resetPasswordStatus = 'Erreur lors de la demande de réinitialisation.'
+			  return false
+			}
+		 },
+	
+		 clearResetPasswordStatus() {
+			this.resetPasswordStatus = null
+		 }
 	}
 })
