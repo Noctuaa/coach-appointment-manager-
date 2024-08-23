@@ -12,8 +12,8 @@
 </script>
 
 <template>
-   <div class="auth-container">
-      <div class="auth-img" :class="{ toggleAuth: !showLogin}"></div>
+   <div class="auth-container" :class="{'toggle-form': !showLogin}">
+      <div class="auth-img"></div>
       <transition name="fade" mode="out-in">
          <ResetPassword v-if="!showLogin" @back-to-login="toggleForm"/>
          <LoginForm v-model:showLogin="showLogin" @forgot-password="toggleForm" v-else />
