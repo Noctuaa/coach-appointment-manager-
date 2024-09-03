@@ -5,12 +5,11 @@
 
 export const up = async (knex)  => {
    await knex.schema.createTable('roles', (table) => {
+      table.engine('InnoDB');
       table.increments('id').primary().notNullable();
       table.string('name', 191).notNullable().unique();
       table.timestamps(true, true);
-   }).then(() => 
-      knex.raw('ALTER TABLE roles ENGINE = InnoDB' 
-   ));
+   })
 };
 
 
