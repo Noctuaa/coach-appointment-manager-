@@ -1,0 +1,18 @@
+/**
+ * @param { import("knex").Knex } knex
+ * @returns { Promise<void> }
+ */
+
+export const up = async (knex)  => {
+   await knex.schema.createTable('roles', (table) => {
+      table.engine('InnoDB');
+      table.increments('id').primary().notNullable();
+      table.string('name', 191).notNullable().unique();
+      table.timestamps(true, true);
+   })
+};
+
+
+export const down = async (knex) => {
+   await knex.schema.dropTable('roles');
+};
