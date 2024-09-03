@@ -1,4 +1,5 @@
 import { Model } from "objection";
+import Role from "./Role.js";
 
 class User extends Model {
    // Définit le nom de la table dans la base de données
@@ -22,10 +23,22 @@ class User extends Model {
       };
    }
 
-   // Définit les relations avec d'autres modèles (à implémenter plus tard)
+   // Définit les relations avec le model Role
   static get relationMappings() {
-   // Sera implémenté quand nous ajouterons la relation avec les rôles
-   return {};
+   return {
+      roles:{
+         relation: Model.ManyToManyRelation,
+         modelClass: Role,
+         join: {
+            from: 'users.id',
+            through: {
+               from: 'users_roles.user_id',
+               to: 'users_roles.role_id'
+            },
+            to: 'roles.id'
+         }
+      }
+   };
  }
 }
 
