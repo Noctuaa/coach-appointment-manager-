@@ -13,7 +13,7 @@ class User extends Model {
          required: ['email', 'password'],
 
          properties:{
-            id: { type: 'intgerer'},
+            id: { type: 'integer'},
             email: { type: 'string', format: 'email', minLength: 5, maxLength: 255 },
             password: { type: 'string', minLength: 6, maxLength: 255 },
             created_at: { type: 'string', format: 'date-time' },
