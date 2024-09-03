@@ -16,7 +16,7 @@ export default {
       directory: './src/db/migrations'
     },
     seeds: {
-      directory: './db/seeds'
+      directory: './src/db/seeds'
     }
   }
 };
