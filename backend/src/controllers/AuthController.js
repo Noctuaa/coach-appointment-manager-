@@ -44,7 +44,49 @@ class AuthController {
       } catch (error) {
          res.status(400).json({ message: `Erreur lors de la création de l'utilisateur'`, error: error.message });
       }
-   }
+   };
+
+   static async login (req, res) {
+      try {
+         const { email, password, rememberMe } = req.body;
+
+         // Vérifie si l'utilisateur existe
+         const user = await User.query().findOne({email}).withGraphFetched('roles');
+         if(!user) { return res.status(401).json({ message: "Email ou mot de passe incorrect"})};
+
+         // Vérifie le password
+         const isValidPassword = await bcrypt.compare(password, user.password);
+         if(!isValidPassword) { return res.status(401).json({ message: "Email ou mot de passe incorrect"})};
+
+         // Génére le token JWT
+         const token = jwt.sign({ id: user.id, roles: user.roles.map(role => role.name)},
+            process.env.JWT_SECRET,
+            { expiresIn: rememberMe ? '30d' : '1d'}
+         )
+
+         // Configure le cookie
+         res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: rememberMe ? 30 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000 // 30 jours ou 1 jour
+         })
+
+         res.json({
+            message: 'Connexion réussie',
+            user: {
+               id: user.id,
+               email: user.email,
+               rememberMe: rememberMe,
+               roles: user.roles.map(role => role.name),
+            }
+         })
+
+      } catch (error) {
+         console.error('Erreur lors de la connexion:', error);
+         res.status(500).json({ message: 'Erreur lors de la connexion' });
+      }
+   };
 }
 
 
