@@ -1,6 +1,12 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 
+/**
+ * Middleware pour vérifier l'authentification de l'utilisateur
+ * @param {Object} req - Objet de requête Express
+ * @param {Object} res - Objet de requête Express
+ * @param {function} next - Fonction pour passer au middleware suivant
+ */
 const authMiddleware = async (req, res, next) => {
    try {
       // Récupérer le token du cookie

@@ -5,7 +5,12 @@ import Role from '../models/Role.js';
 import { transaction } from 'objection';
 
 class AuthController {
-
+   /**
+    * Gère l'inscription d'un nouvel utilisateur
+    * @param {Object} req - Objet de requête Express
+    * @param {Object} req - Objet de requête Express 
+    * @returns 
+    */
    static async signup (req, res) {
       try {
          const { email, password, role = 'user' } = req.body;
@@ -46,6 +51,12 @@ class AuthController {
       }
    };
 
+   /**
+    * * Gère la connexion d'un utilisateur
+    * @param {Object} req - Objet de requête Express
+    * @param {Object} req - Objet de requête Express 
+    * @returns 
+    */
    static async login (req, res) {
       try {
          const { email, password, rememberMe } = req.body;
@@ -88,8 +99,14 @@ class AuthController {
       }
    };
 
+   /**
+    * Gère la déconnexion d'un utilisateur
+    * @param {Object} req - Objet de requête Express
+    * @param {Object} req - Objet de requête Express 
+    */
    static async logout(req,res) {
       try {
+         // Efface le cookie contenant le token JWT
          res.clearCookie('token',{
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
