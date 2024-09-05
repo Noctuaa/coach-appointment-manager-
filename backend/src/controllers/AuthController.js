@@ -87,6 +87,21 @@ class AuthController {
          res.status(500).json({ message: 'Erreur lors de la connexion' });
       }
    };
+
+   static async logout(req,res) {
+      try {
+         res.clearCookie('token',{
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict'
+         });
+
+         res.status(200).json({message: 'Déconnexion réussie' });
+      } catch (error) {
+         console.error('Erreur lors de la déconnexion:', error);
+         res.status(500).json({ message: 'Erreur lors de la déconnexion' });
+      }
+   }
 }
 
 
