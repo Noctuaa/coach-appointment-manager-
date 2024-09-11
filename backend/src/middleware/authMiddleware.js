@@ -9,12 +9,18 @@ import User from '../models/User.js';
  */
 const authMiddleware = async (req, res, next) => {
    try {
-      // Récupérer le token du cookie
-      const token = req.cookies.token;
-      if(!token) { return res.status(401).json({ message: "Authentification requise" })};
+      // Récupére les token et fait une vérification si ils existent
+      const csrfToken = req.headers['x-csrf-token'] == 'null' ? false : req.headers['x-csrf-token'] ;
+      const accessToken = req.cookies.accessToken;
+      const refreshToken = req.cookies.refreshToken;
+
+      if(!refreshToken) { return res.status(401).json({isAuthenticated : false, message: 'Authentification requise'})}
+
+      if(!accessToken || !csrfToken) { return res.status(401).json({ message: "Token expiré", isAuthenticated: true, refresh: true })};
+
 
       // Vérifie le token
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const decoded = jwt.verify(accessToken, process.env.JWT_ACCESS_SECRET);
 
       // Vérifie si l'utilisateur existe toujours dans la base de données
       const user = await User.query().findById(decoded.id).withGraphFetched('roles');
