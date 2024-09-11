@@ -55,7 +55,7 @@ class AuthController {
    /**
     * Gère l'inscription d'un nouvel utilisateur
     * @param {Object} req - Objet de requête Express
-    * @param {Object} req - Objet de requête Express 
+    * @param {Object} res - Objet de réponse Express 
     * @returns {Object} Réponse JSON avec les détails de l'utilisateur créé et le token.
     */
    static async signup (req, res) {
@@ -96,7 +96,7 @@ class AuthController {
    /**
     * * Gère la connexion d'un utilisateur
     * @param {Object} req - Objet de requête Express
-    * @param {Object} req - Objet de requête Express 
+    * @param {Object} res - Objet de réponse Express
     * @returns Réponse JSON avec le message de succès, les détails de l'utilisateur et le token CSRF.
     */
    static async login (req, res) {
@@ -139,7 +139,7 @@ class AuthController {
    /**
     * Rafraîchit le token d'accès de l'utilisateur.
     * @param {Object} req - Objet de requête Express
-    * @param {Object} req - Objet de requête Express 
+    * @param {Object} res - Objet de réponse Express
     * @returns {Object} Réponse JSON avec le message de succès et le nouveau token CSRF.
     */
    static async refresh(req, res) {
@@ -172,7 +172,7 @@ class AuthController {
     /**
      * * Renvoie les informations de l'utilisateur actuellement authentifié.
     * @param {Object} req - Objet de requête Express
-    * @param {Object} req - Objet de requête Express 
+    * @param {Object} res - Objet de réponse Express
     * @returns {Object} Réponse JSON avec l'état d'authentification et les informations de l'utilisateur.
       */
     static async me(req, res) {
@@ -183,7 +183,7 @@ class AuthController {
    /**
     * Gère la déconnexion d'un utilisateur
     * @param {Object} req - Objet de requête Express
-    * @param {Object} req - Objet de requête Express 
+    * @param {Object} res - Objet de réponse Express
 	 * @returns {Object} Réponse JSON confirmant la déconnexion.
     */
    static async logout(req,res) {
