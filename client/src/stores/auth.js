@@ -1,70 +1,92 @@
 import { defineStore } from 'pinia'
+import { fetchWithAuth } from '@/utils/fetchUtils';
+import router from '@/router';
+
 
 export const useAuthStore = defineStore('auth', {
 	state: () => ({
 		user: null,
 		isAuthenticated: false,
 		rememberMe: false,
-		resetPasswordStatus: null
+		resetPasswordStatus: null,
+		isAuthChecked: false,
+		csrfToken : null
 	}),
 
 	actions: {
 		async login(email, password, rememberMe){
-			// Simulation d'un appel API
-			console.log('Tentative de connexion avec :', email);
+			try {
+				const response = await fetchWithAuth('/api/auth/login', {
+					method: 'POST',
+					headers: { 
+						'Content-Type': 'application/json',
+						//'X-CSRF-token': localStorage.getItem('csrfToken')
+					 },
+					body: JSON.stringify({email, password, rememberMe})
+				});
 
-			// Dans une vraie implémentation, nous ferions un appel API ici
-			await new Promise(resolve => setTimeout(resolve,1000));
+				if (!response.ok) { throw new Error('Erreur lors de la connexion');};
 
-			// Simulation de connexion réussie
-			this.user = { email };
-			this.isAuthenticated = true;
-			this.rememberMe = rememberMe;
+				const data = await response.json();
 
-			if(rememberMe) {
-				// Stockez le token dans le localStorage
-				localStorage.setItem('authToken', 'fake-jwt-token');
-			}else{
-				// Stockez le token dans le sessionStorage
-				sessionStorage.setItem('authToken', 'fake-jwt-token');
+				this.user = data.user;
+				this.isAuthenticated = data.isAuthenticated;
+				this.csrfToken = data.csrfToken;
+				localStorage.setItem('csrfToken', data.csrfToken);
+
+				router.push('/dashboard');
+			} catch (error) {
+				console.error('Login error:', error);
+				throw error;
 			}
+		},
+
+		async checkAuth() {
+			if (this.isAuthChecked) return;
+
+			try {
+				const response = await fetchWithAuth('/api/auth/me');
+				const data = await response.json();
+
+				if (data.isAuthenticated) {
+					this.user = await data.user;
+					this.isAuthenticated = await data.isAuthenticated;
+				 } else {
+					this.user = await data.user;
+					this.isAuthenticated = await data.isAuthenticated;
+				 }
+
+			} catch (error) {
+				//throw error(`Erreur lors de la vérification de l'authentification:`, error);
+				this.user = null;
+				this.isAuthenticated = false;
+			}finally {
+        		this.isAuthChecked = true;
+      	}
 		},
 
 		async logout() {
 
 			// Simulation d'un délai d'appel API pour la déconnexion
-			await new Promise(resolve => setTimeout(resolve, 500));
+			try {
+				const response = await fetchWithAuth('/api/auth/logout', {
+					method: 'POST',
+					headers: { 
+						'Content-Type': 'application/json',
+						'X-CSRF-token': localStorage.getItem('csrfToken')
+					 },
+				});
+				if (!response.ok) { throw new Error('Erreur lors de la déconnexion');};
 
-			this.user = null;
-			this.isAuthenticated = false;
-			this.rememberMe = false;
-			
+				const data = await response.json();
 
-			// Dans une vraie implémentation, nous supprimerions ici le token JWT
-			sessionStorage.removeItem('authToken');
-			localStorage.removeItem('token');
-		},
+				localStorage.removeItem('csrfToken');
+				this.user = await data.user;
+				this.isAuthenticated = await data.isAuthenticated
+				router.push('/');
 
-		async checkAuth() {
-			const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
-			if( token ) {
-				try {
-					// Simulation d'un délai d'appel API pour la déconnexion
-					await new Promise(resolve => setTimeout(resolve, 500))
-
-					// Simulation de connexion réussie
-					this.isAuthenticated = true;
-					this.rememberMe = !!localStorage.getItem('authToken');
-					this.user = { email: 'John@Doe.com' }; // En réalité, ces infos viendraient du serveur
-				} catch (error) {
-					console.error("Erreur lors de la vérification de l'authentification:'", error);
-					this.isAuthenticated = false;
-					this.user = null;
-					localStorage.removeItem('token');
-				}
-			} else {
-				this.isAuthenticated = false;
-				this.user = null;
+			} catch (error) {
+				
 			}
 		},
 
@@ -87,3 +109,4 @@ export const useAuthStore = defineStore('auth', {
 		 }
 	}
 })
+
