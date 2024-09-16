@@ -177,7 +177,11 @@ class AuthController {
       */
     static async me(req, res) {
       // L'utilisateur est déjà vérifié par le middleware, donc req.user existe
-      res.json({ isAuthenticated: true, user: { id: req.user.id, email: req.user.email}});
+      res.json({ isAuthenticated: true, user: { 
+         id: req.user.id, 
+         email: req.user.email,
+         roles: req.user.roles.map(role => role.name)        
+      }});
     }
     
    /**
