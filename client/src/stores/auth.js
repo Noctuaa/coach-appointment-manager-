@@ -3,47 +3,75 @@ import { fetchWithAuth } from '@/utils/fetchUtils';
 import router from '@/router';
 
 
+/**
+ * Store Pinia pour la gestion de l'authentification.
+ * @typedef {Object} AuthStore
+ * @property {Object|null} user - Informations de l'utilisateur connecté
+ * @property {boolean} isAuthenticated - Indique si l'utilisateur est authentifié
+ * @property {boolean} rememberMe - Option "Se souvenir de moi"
+ * @property {string|null} csrfToken - Token CSRF pour la sécurité
+ * @property {Array} errors - Tableau des erreurs d'authentification
+ */
+
+/**
+ * Crée et exporte le store d'authentification.
+ * @type {AuthStore}
+ */
 export const useAuthStore = defineStore('auth', {
 	state: () => ({
 		user: null,
 		isAuthenticated: false,
 		rememberMe: false,
-		resetPasswordStatus: null,
-		isAuthChecked: false,
-		csrfToken : null
+		csrfToken : localStorage.getItem('csrfToken') || null,
+		errors: []
 	}),
 
 	actions: {
+		
+		/**
+		 * Connexion de l'utilisateur
+		 * @param {String} email - Email de l'utilisateur
+		 * @param {String} password - Password de l'utilisateur
+		 * @param {Boolean} rememberMe - Se souvenir de moi
+		 * @throws {Error} Si la connexion échoue
+		 */
 		async login(email, password, rememberMe){
 			try {
-				const response = await fetchWithAuth('/api/auth/login', {
+				const response = await fetch('/api/auth/login', {
 					method: 'POST',
 					headers: { 
 						'Content-Type': 'application/json',
-						//'X-CSRF-token': localStorage.getItem('csrfToken')
 					 },
 					body: JSON.stringify({email, password, rememberMe})
 				});
 
-				if (!response.ok) { throw new Error('Erreur lors de la connexion');};
-
 				const data = await response.json();
+				
+				if (!response.ok) { 
+					if(data.errors){
+						this.errors = data.errors;
+					}
+					throw new Error('Erreur lors de la connexion');
+				};
+
+
 
 				this.user = data.user;
 				this.isAuthenticated = data.isAuthenticated;
 				this.csrfToken = data.csrfToken;
 				localStorage.setItem('csrfToken', data.csrfToken);
-
+				this.errors = [];
 				router.push('/dashboard');
 			} catch (error) {
 				console.error('Login error:', error);
-				throw error;
 			}
 		},
 
+		/**
+		 * Vérifie l'état d'authentification de l'utilisateur.
+		 * @async
+		 */
 		async checkAuth() {
-			if (this.isAuthChecked) return;
-
 			try {
 				const response = await fetchWithAuth('/api/auth/me');
 				const data = await response.json();
@@ -51,31 +79,24 @@ export const useAuthStore = defineStore('auth', {
 				if (data.isAuthenticated) {
 					this.user = await data.user;
 					this.isAuthenticated = await data.isAuthenticated;
-				 } else {
-					this.user = await data.user;
-					this.isAuthenticated = await data.isAuthenticated;
 				 }
 
 			} catch (error) {
-				//throw error(`Erreur lors de la vérification de l'authentification:`, error);
 				this.user = null;
 				this.isAuthenticated = false;
-			}finally {
-        		this.isAuthChecked = true;
-      	}
+				//throw error(`Erreur lors de la vérification de l'authentification:`, error);
+			}
 		},
 
+   	/**
+       * Déconnecte l'utilisateur.
+       * @async
+       * @throws {Error} Si la déconnexion échoue
+      */
 		async logout() {
-
-			// Simulation d'un délai d'appel API pour la déconnexion
 			try {
-				const response = await fetchWithAuth('/api/auth/logout', {
-					method: 'POST',
-					headers: { 
-						'Content-Type': 'application/json',
-						'X-CSRF-token': localStorage.getItem('csrfToken')
-					 },
-				});
+				const response = await fetchWithAuth('/api/auth/logout', { method: 'POST' });
+				
 				if (!response.ok) { throw new Error('Erreur lors de la déconnexion');};
 
 				const data = await response.json();
@@ -86,27 +107,12 @@ export const useAuthStore = defineStore('auth', {
 				router.push('/');
 
 			} catch (error) {
-				
+				console.error('Erreur lors de la déconnexion:', error);
+				this.user = null;
+				this.isAuthenticated = false;
+				localStorage.removeItem('csrfToken');
 			}
 		},
-
-		async requestPasswordReset(email) {
-			try {
-			  // appel API pour demander la réinitialisation du mot de passe
-			  // Simulation d'un délai d'appel API 
-			  await new Promise(resolve => setTimeout(resolve, 1000))
-			  
-			  this.resetPasswordStatus = 'Un email de réinitialisation a été envoyé.'
-			  return true
-			} catch (error) {
-			  this.resetPasswordStatus = 'Erreur lors de la demande de réinitialisation.'
-			  return false
-			}
-		 },
-	
-		 clearResetPasswordStatus() {
-			this.resetPasswordStatus = null
-		 }
 	}
 })
 
