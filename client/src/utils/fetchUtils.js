@@ -11,7 +11,11 @@ export const fetchWithAuth = async (url, options = {}) => {
 	// Prépare les options de la requête en incluant le CSRF token et les credentials
 	const fetchOptions = { 
 		...options,
-		headers: {...options.headers,  'X-CSRF-Token': localStorage.getItem('csrfToken')},  // Ajoute le CSRF token aux headers
+		headers: {
+			...options.headers,  
+			'X-CSRF-Token': localStorage.getItem('csrfToken'), // Ajoute le CSRF token aux headers
+			'Content-Type': 'application/json'
+		},  
 		credentials: 'include' // Inclut les cookies dans la requête
 	};
 
