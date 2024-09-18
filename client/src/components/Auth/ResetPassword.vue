@@ -24,18 +24,20 @@
 </script>
 
 <template>
-		<div class="reset-password">
-			<h2 class="txt-center">Récupérer mon mot de passe</h2>
+		<div class="form-container">
+			<div class="form-title">
+				<h2 class="txt-center">Récupérer mon mot de passe</h2>
+			</div>
 			<form @submit.prevent="handleResetPassword">
 				<div class="form-group">
-					<label for="reset-email">Email :</label>
-					<input type="email" id="reset-email" v-model="email" required>
-				</div>
-				<div class="txt-right">
-					<a href="#" @click.prevent="handleBackToLogin">Connexion</a>
+					<input type="email" id="reset-email" v-model="email" placeholder="">
+					<label for="reset-email">Email</label>
 				</div>
 				<div class="form-group">
 					<button type="submit" class="btn btn-primary">Envoyer</button>
+				</div>
+				<div class="txt-center">
+					<a href="#" @click.prevent="handleBackToLogin">Se connecter</a>
 				</div>
 			</form>
       </div>
