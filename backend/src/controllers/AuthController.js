@@ -102,11 +102,14 @@ class AuthController {
    static async login (req, res) {
       try {
          const { email, password, rememberMe } = req.body;
+         // Renvoie la même erreur pour l'utilisateur et le password si non correct.
+         const errorStatus = { errors: [{ path: "global", msg: "Email ou mot de passe incorrect." }]};
 
          // Vérifie si l'utilisateur existe et si le paswword ext correct
          const user = await User.query().findOne({email}).withGraphFetched('roles');
+         if(!user) { return res.status(401).json(errorStatus)};
          const isValidPassword = await bcrypt.compare(password, user.password);
-         if(!user || !isValidPassword) { return res.status(401).json({ message: "Email ou mot de passe incorrect"})};
+         if(!isValidPassword) { return res.status(401).json(errorStatus)};
 
          // Génére les tokens
          const csrfToken = AuthController.generateCSRFToken();
