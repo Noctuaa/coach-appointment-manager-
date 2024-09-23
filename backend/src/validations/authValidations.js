@@ -32,6 +32,12 @@ const validate = (req, res, next) => {
  */
 export const validateSignup = [
    body('email').isEmail().withMessage('Email Invalide'),
+   body('lastname').notEmpty().withMessage('Le nom est requis')
+   .isLength({min: 3, max: 50}).withMessage('Le nom doit contenir entre 3 et 50 caractères')
+   .matches(/^[a-zA-Z\s-]+$/).withMessage('Le nom ne doit contenir que des lettres, des espaces et des tirets'),
+   body('firstname').notEmpty().withMessage('Le prénom est requis')
+   .isLength({min: 3, max: 50}).withMessage('Le prénom doit contenir entre 3 et 50 caractères')
+   .matches(/^[a-zA-Z\s-]+$/).withMessage('Le prénom ne doit contenir que des lettres, des espaces et des tirets'),
    body('password').
    isLength({min: 8}).withMessage('Doit contenir au moins 8 caractères')
    .matches(/\d/).withMessage('Ddoit contenir au moins un chiffre')
