@@ -60,7 +60,7 @@ class AuthController {
     */
    static async signup (req, res) {
       try {
-         const { email, password, role = 'user' } = req.body;
+         const { email, lastname, firstname , password, role = 'user' } = req.body;
 
          // Vérifier si l'utilisateur existe déjà
          const emailIsExist = await User.query().findOne({ email });
@@ -78,6 +78,8 @@ class AuthController {
             //Création de l'utilisateur
             const user = await User.query(trx).insert({
                email: email,
+               lastname: lastname,
+               firstname: firstname,
                password: hashedPassword
             });
 
@@ -127,6 +129,8 @@ class AuthController {
             user: {
                id: user.id,
                email: user.email,
+               lastname: user.lastname,
+               firstname: user.firstname,
                roles: user.roles.map(role => role.name),
             },
 				isAuthenticated: true,
@@ -147,7 +151,6 @@ class AuthController {
     */
    static async refresh(req, res) {
       const refreshToken = req.cookies.refreshToken;
-    
       if (!refreshToken) {
         return res.status(401).json({ message: 'Refresh token manquant' });
       }
@@ -183,6 +186,8 @@ class AuthController {
       res.json({ isAuthenticated: true, user: { 
          id: req.user.id, 
          email: req.user.email,
+         lastname: req.user.lastname,
+         firstname: req.user.firstname,
          roles: req.user.roles.map(role => role.name)        
       }});
     }
