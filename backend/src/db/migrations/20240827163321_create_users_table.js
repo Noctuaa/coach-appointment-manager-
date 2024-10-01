@@ -8,6 +8,8 @@ export const up = async (knex) => {
       table.engine('InnoDB');
       table.increments('id').primary().notNullable();
       table.string('email', 191).notNullable().unique();
+      table.string('lastname', 50).notNullable();
+      table.string('firstname', 50).notNullable();
       table.string('password', 255).notNullable();
       table.timestamps(true, true);
    })

@@ -12,11 +12,11 @@
 </script>
 
 <template>
-   <div class="auth-container" :class="{'toggle-form': !showLogin}">
-      <div class="auth-img"></div>
+   <div class="background"></div>
+   <div class="auth-container">
       <transition name="fade" mode="out-in">
-         <ResetPassword v-if="!showLogin" @back-to-login="toggleForm"/>
-         <LoginForm v-model:showLogin="showLogin" @forgot-password="toggleForm" v-else />
+         <ResetPassword v-if="!showLogin"  @back-to-login="toggleForm"/>
+         <LoginForm v-model:showLogin="showLogin" @forgot-password="toggleForm" v-else/>
       </transition>
    </div>
 </template>

@@ -1,89 +1,118 @@
 import { defineStore } from 'pinia'
+import { fetchWithAuth } from '@/utils/fetchUtils';
+import router from '@/router';
 
+
+/**
+ * Store Pinia pour la gestion de l'authentification.
+ * @typedef {Object} AuthStore
+ * @property {Object|null} user - Informations de l'utilisateur connecté
+ * @property {boolean} isAuthenticated - Indique si l'utilisateur est authentifié
+ * @property {boolean} rememberMe - Option "Se souvenir de moi"
+ * @property {string|null} csrfToken - Token CSRF pour la sécurité
+ * @property {Array} errors - Tableau des erreurs d'authentification
+ */
+
+/**
+ * Crée et exporte le store d'authentification.
+ * @type {AuthStore}
+ */
 export const useAuthStore = defineStore('auth', {
 	state: () => ({
 		user: null,
 		isAuthenticated: false,
 		rememberMe: false,
-		resetPasswordStatus: null
+		csrfToken : localStorage.getItem('csrfToken') || null,
+		errors: []
 	}),
 
 	actions: {
+		
+		/**
+		 * Connexion de l'utilisateur
+		 * @param {String} email - Email de l'utilisateur
+		 * @param {String} password - Password de l'utilisateur
+		 * @param {Boolean} rememberMe - Se souvenir de moi
+		 * @throws {Error} Si la connexion échoue
+		 */
 		async login(email, password, rememberMe){
-			// Simulation d'un appel API
-			console.log('Tentative de connexion avec :', email);
-
-			// Dans une vraie implémentation, nous ferions un appel API ici
-			await new Promise(resolve => setTimeout(resolve,1000));
-
-			// Simulation de connexion réussie
-			this.user = { email };
-			this.isAuthenticated = true;
-			this.rememberMe = rememberMe;
-
-			if(rememberMe) {
-				// Stockez le token dans le localStorage
-				localStorage.setItem('authToken', 'fake-jwt-token');
-			}else{
-				// Stockez le token dans le sessionStorage
-				sessionStorage.setItem('authToken', 'fake-jwt-token');
-			}
-		},
-
-		async logout() {
-
-			// Simulation d'un délai d'appel API pour la déconnexion
-			await new Promise(resolve => setTimeout(resolve, 500));
-
-			this.user = null;
-			this.isAuthenticated = false;
-			this.rememberMe = false;
-			
-
-			// Dans une vraie implémentation, nous supprimerions ici le token JWT
-			sessionStorage.removeItem('authToken');
-			localStorage.removeItem('token');
-		},
-
-		async checkAuth() {
-			const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
-			if( token ) {
-				try {
-					// Simulation d'un délai d'appel API pour la déconnexion
-					await new Promise(resolve => setTimeout(resolve, 500))
-
-					// Simulation de connexion réussie
-					this.isAuthenticated = true;
-					this.rememberMe = !!localStorage.getItem('authToken');
-					this.user = { email: 'John@Doe.com' }; // En réalité, ces infos viendraient du serveur
-				} catch (error) {
-					console.error("Erreur lors de la vérification de l'authentification:'", error);
-					this.isAuthenticated = false;
-					this.user = null;
-					localStorage.removeItem('token');
-				}
-			} else {
-				this.isAuthenticated = false;
-				this.user = null;
-			}
-		},
-
-		async requestPasswordReset(email) {
 			try {
-			  // appel API pour demander la réinitialisation du mot de passe
-			  // Simulation d'un délai d'appel API 
-			  await new Promise(resolve => setTimeout(resolve, 1000))
-			  
-			  this.resetPasswordStatus = 'Un email de réinitialisation a été envoyé.'
-			  return true
+				const response = await fetch('/api/auth/login', {
+					method: 'POST',
+					headers: { 
+						'Content-Type': 'application/json',
+					 },
+					body: JSON.stringify({email, password, rememberMe})
+				});
+
+				const data = await response.json();
+				
+				if (!response.ok) { 
+					if(data.errors){
+						this.errors = data.errors;
+					}
+					throw new Error('Erreur lors de la connexion');
+				};
+
+
+
+				this.user = data.user;
+				this.isAuthenticated = data.isAuthenticated;
+				this.csrfToken = data.csrfToken;
+				localStorage.setItem('csrfToken', data.csrfToken);
+				this.errors = [];
+				router.push('/dashboard');
 			} catch (error) {
-			  this.resetPasswordStatus = 'Erreur lors de la demande de réinitialisation.'
-			  return false
+				console.error('Login error:', error);
 			}
-		 },
-	
-		 clearResetPasswordStatus() {
-			this.resetPasswordStatus = null
-		 }
+		},
+
+		/**
+		 * Vérifie l'état d'authentification de l'utilisateur.
+		 * @async
+		 */
+		async checkAuth() {
+			try {
+				const response = await fetchWithAuth('/api/auth/me');
+				const data = await response.json();
+
+				if (data.isAuthenticated) {
+					this.user = await data.user;
+					this.isAuthenticated = await data.isAuthenticated;
+				 }
+
+			} catch (error) {
+				this.user = null;
+				this.isAuthenticated = false;
+				//throw error(`Erreur lors de la vérification de l'authentification:`, error);
+			}
+		},
+
+   	/**
+       * Déconnecte l'utilisateur.
+       * @async
+       * @throws {Error} Si la déconnexion échoue
+      */
+		async logout() {
+			try {
+				const response = await fetchWithAuth('/api/auth/logout', { method: 'POST' });
+				
+				if (!response.ok) { throw new Error('Erreur lors de la déconnexion');};
+
+				const data = await response.json();
+
+				localStorage.removeItem('csrfToken');
+				this.user = await data.user;
+				this.isAuthenticated = await data.isAuthenticated
+				router.push('/');
+
+			} catch (error) {
+				console.error('Erreur lors de la déconnexion:', error);
+				this.user = null;
+				this.isAuthenticated = false;
+				localStorage.removeItem('csrfToken');
+			}
+		},
 	}
 })
+
