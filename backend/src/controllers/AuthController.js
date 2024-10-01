@@ -91,7 +91,7 @@ class AuthController {
 
          res.status(201).json({ user: { id: result.id, email: result.email, role:role }});
       } catch (error) {
-         res.status(400).json({ message: `Erreur lors de la création de l'utilisateur'`, error: error.message });
+         res.status(400).json({ message: `Erreur lors de la création de l'utilisateur`, error: error.message });
       }
    };
 
@@ -149,7 +149,7 @@ class AuthController {
     * @param {Object} res - Objet de réponse Express
     * @returns {Object} Réponse JSON avec le message de succès et le nouveau token CSRF.
     */
-   static async refresh(req, res) {
+   static refresh(req, res) {
       const refreshToken = req.cookies.refreshToken;
       if (!refreshToken) {
         return res.status(401).json({ message: 'Refresh token manquant' });
@@ -159,15 +159,9 @@ class AuthController {
         const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
         const newCsrfToken = AuthController.generateCSRFToken();
         const newAccessToken = AuthController.generateAccessToken(decoded.id, newCsrfToken);
+   
+        res.cookie('accessToken', newAccessToken, AuthController.cookieOptions(process.env.JWT_ACCESS_LIFE * 60 * 1000))
 
-    
-        res.cookie('accessToken', newAccessToken, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-          sameSite: 'strict',
-          maxAge: process.env.JWT_ACCESS_LIFE * 60 * 1000
-        });
-    
         res.json({ message: 'Token rafraîchi avec succès', csrfToken: newCsrfToken });
       } catch (error) {
         console.error('Erreur lors du rafraîchissement du token:', error);
